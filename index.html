@@ -87,7 +87,7 @@ body {
 .c-scroll::-webkit-scrollbar-thumb { background: #dce4f5; border-radius: 2px; }
 
 /* Canvas base: A1:260 A2:240 B1:280 B2:220 C1:200 C2:170 = 1370 wide */
-.canvas { position: relative; width: 1370px; height: 475px; min-height: 475px; }
+.canvas { position: relative; width: 1370px; height: 650px; min-height: 650px; }
 
 /* Tooltip */
 #tip { position:fixed; background:#1e2a4a; color:white; font-size:12px; padding:6px 11px; border-radius:10px; pointer-events:none; display:none; z-index:300; box-shadow:0 2px 10px rgba(30,42,74,0.25); white-space:nowrap; }
@@ -1009,8 +1009,8 @@ function showToast(msg) {
 
 // ─── SVG size (grammar) ───────────────────────────────────────────────────────
 requestAnimationFrame(() => {
-  svgC.setAttribute('viewBox','0 0 1370 475');
-  svgC.style.height = '475px';
+  svgC.setAttribute('viewBox','0 0 1370 650');
+  svgC.style.height = '650px';
 });
 
 // ─── Event listeners (replaces all onclick attributes for iOS compat) ─────────
