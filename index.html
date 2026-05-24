@@ -82,12 +82,9 @@ body {
 .gram-view { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
 
 /* ── Scroll container (shared by gram + vocab) ── */
-.c-scroll { flex: 1; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: #dce4f5 transparent; }
-.c-scroll::-webkit-scrollbar { height: 4px; }
+.c-scroll { flex: 1; overflow: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: #dce4f5 transparent; }
+.c-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
 .c-scroll::-webkit-scrollbar-thumb { background: #dce4f5; border-radius: 2px; }
-/* Vocab scroll allows both directions */
-.vok-scroll { overflow: auto; }
-.vok-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
 
 /* Canvas base: A1:260 A2:240 B1:280 B2:220 C1:200 C2:170 = 1370 wide */
 .canvas { position: relative; width: 1370px; height: 475px; min-height: 475px; }
@@ -385,7 +382,7 @@ body {
         </div>Aktiv
       </div>
       <div class="li"><div class="ld" style="background:#f0f4ff;border:1.5px solid #ccd6ee;width:10px;height:10px;border-radius:50%;"></div>Offen</div>
-      <div class="lhint">→ scrollen für C1/C2</div>
+      <div class="lhint">→ ↕ scrollen</div>
     </div>
   </div>
 
