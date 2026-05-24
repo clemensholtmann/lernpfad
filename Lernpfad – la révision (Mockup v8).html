@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lernpfad – la révision (Mockup v8)</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #e8edf8; color: #1e2a4a;
+  height: 100vh; height: 100dvh; overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── App shell ── */
+.app-shell { position: fixed; inset: 0; display: flex; }
+.sidebar { width: 286px; background: #fff; border-right: 1px solid #dce4f5; display: flex; flex-direction: column; flex-shrink: 0; }
+.sh { padding: 17px 15px 13px; border-bottom: 1px solid #dce4f5; display: flex; align-items: center; justify-content: space-between; }
+.sh-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 600; }
+.sh-btns { display: flex; gap: 5px; }
+.hbtn { width: 40px; height: 40px; border-radius: 50%; background: #f0f4ff; border: none; cursor: pointer; font-size: 15px; color: #5a6a8a; display: flex; align-items: center; justify-content: center; transition: background 0.15s; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.hbtn:hover { background: #dce4f5; }
+.hbtn:active { background: #dce4f5; }
+.sl { padding: 6px 6px; display: flex; flex-direction: column; gap: 1px; }
+.si { padding: 9px 12px; display: flex; gap: 10px; align-items: center; border-radius: 10px; cursor: pointer; }
+.si:hover { background: #f5f7fe; }
+.si.sel { background: #fef1f3; }
+.sb { width: 36px; height: 36px; border-radius: 8px; background: #e8edf8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #4a5a7a; flex-shrink: 0; position: relative; }
+.sb.acc { background: #fce7ec; color: #e11d48; font-family: 'Fraunces', serif; font-style: italic; font-size: 14px; }
+.dd { position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; border-radius: 50%; background: #e11d48; border: 1.5px solid white; }
+.sn { font-size: 13px; font-weight: 500; }
+.ss { font-size: 11px; color: #9aaac8; margin-top: 1px; }
+.chat-area { flex: 1; background: #e8edf8; }
+
+/* ── Add Dialog (centered modal, same as App.js) ── */
+.add-dlg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
+.add-dlg.on { display: flex; }
+.add-dlg-inner { background: white; border-radius: 14px; padding: 1.25rem; width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 12px 40px rgba(0,0,0,0.22); max-height: 85vh; overflow: hidden; }
+.dh { display: none; }
+
+/* ── Miniatur ── */
+.mini-lp { margin: 12px 14px 6px; border-radius: 14px; border: 1.5px solid #e4eaf6; overflow: hidden; cursor: pointer; background: #f6f8fe; transition: border-color 0.15s; }
+.mini-lp:hover { border-color: #c0ccec; background: #eef1fb; }
+.mini-lp-hdr { display: flex; align-items: center; justify-content: space-between; padding: 8px 11px 4px; }
+.mini-lp-title { font-size: 11.5px; font-weight: 600; color: #1e2a4a; }
+.mini-svg-wrap { padding: 0 8px 7px; }
+
+/* ── Add buttons ── */
+.dlg-sec { font-size: 10px; font-weight: 700; color: #b0bdd8; letter-spacing: 0.07em; text-transform: uppercase; padding: 8px 18px 4px; }
+.add-btns { padding: 0 12px; display: flex; flex-direction: column; gap: 5px; }
+.ab { display: flex; align-items: center; gap: 11px; padding: 14px 13px; border-radius: 12px; border: none; background: #f0f4ff; color: #1e2a4a; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; width: 100%; text-align: left; transition: background 0.15s; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.ab:hover, .ab:active { background: #e8edf8; }
+.ab-icon { width: 33px; height: 33px; border-radius: 8px; background: #e8edf8; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+
+/* ── Main Panel ── */
+.lp { position: fixed; left: 0; right: 0; bottom: 0; height: 93vh; background: #f0f4ff; border-radius: 22px 22px 0 0; z-index: 80; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 -10px 50px rgba(30,42,74,0.16); transform: translateY(100%); transition: transform 0.34s cubic-bezier(0.32,0.72,0,1); }
+.lp.on { transform: translateY(0); }
+.lp-handle { width: 36px; height: 4px; background: #dce4f5; border-radius: 2px; margin: 10px auto 0; flex-shrink: 0; }
+.lp-hdr { padding: 12px 20px 12px; background: rgba(240,244,255,0.97); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid #dce4f5; flex-shrink: 0; }
+.lp-hdr-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+.lp-title { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 600; }
+.lp-meta { font-size: 11.5px; color: #7a8aa8; margin-top: 2px; }
+.lp-here { display: inline-flex; align-items: center; gap: 5px; background: #e8edf8; padding: 3px 8px; border-radius: 8px; font-size: 11px; font-weight: 500; color: #4a5a7a; margin-top: 5px; }
+.lp-here-dot { width: 7px; height: 7px; border-radius: 50%; background: #e11d48; }
+.close-btn { width: 40px; height: 40px; border-radius: 50%; background: #e8edf8; border: none; cursor: pointer; font-size: 15px; color: #5a6a8a; display: flex; align-items: center; justify-content: center; transition: background 0.15s; flex-shrink: 0; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.close-btn:hover, .close-btn:active { background: #dce4f5; }
+
+/* ── Toggle + Filter row ── */
+.lp-hdr-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.lp-toggle { display: flex; gap: 3px; background: #e8edf8; border-radius: 20px; padding: 3px; }
+.lp-tog-btn { padding: 7px 14px; border-radius: 17px; font-size: 12px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.18s; background: transparent; color: #5a6a8a; white-space: nowrap; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.lp-tog-btn.on { background: white; color: #1e2a4a; box-shadow: 0 1px 4px rgba(30,42,74,0.12); }
+.tabs { display: flex; gap: 5px; }
+.tab { padding: 7px 13px; border-radius: 20px; font-size: 12px; font-weight: 500; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.tab.on { background: #e11d48; color: white; }
+.tab:not(.on) { background: #e8edf8; color: #5a6a8a; }
+.tab:not(.on):hover, .tab:not(.on):active { background: #dce4f5; }
+
+/* ── Gram View wrapper ── */
+.gram-view { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+
+/* ── Scroll container (shared by gram + vocab) ── */
+.c-scroll { flex: 1; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: #dce4f5 transparent; }
+.c-scroll::-webkit-scrollbar { height: 4px; }
+.c-scroll::-webkit-scrollbar-thumb { background: #dce4f5; border-radius: 2px; }
+/* Vocab scroll allows both directions */
+.vok-scroll { overflow: auto; }
+.vok-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+
+/* Canvas base: A1:260 A2:240 B1:280 B2:220 C1:200 C2:170 = 1370 wide */
+.canvas { position: relative; width: 1370px; height: 475px; min-height: 475px; }
+
+/* Tooltip */
+#tip { position:fixed; background:#1e2a4a; color:white; font-size:12px; padding:6px 11px; border-radius:10px; pointer-events:none; display:none; z-index:300; box-shadow:0 2px 10px rgba(30,42,74,0.25); white-space:nowrap; }
+
+/* Action sheet desc */
+.as-desc { font-size:13px; color:#5a6a8a; line-height:1.9; margin:0 0 14px; display:none; white-space:pre-line; letter-spacing:0.01em; }
+.asb:disabled { background:#c8d4e4; cursor:default; }
+.asb:disabled:hover { background:#c8d4e4; }
+
+/* Vocab section label */
+.vok-sec { font-size:10px; font-weight:700; color:#b0bdd8; letter-spacing:0.07em; text-transform:uppercase; padding:14px 0 2px 0; }
+/* Custom (eigene) vocab group circles */
+.vok-cust.st-a .nc, .vok-cust.st-m .nc { width:52px; height:52px; box-shadow:0 3px 14px rgba(74,90,122,0.24); }
+.vok-cust.st-o .nc { width:52px; height:52px; }
+.vok-cust .nl { font-size:12px; max-width:100px; font-weight:500; color:#3a4a6a; }
+
+.zones { position: absolute; inset: 0; display: flex; }
+.z { position: relative; display: flex; align-items: center; justify-content: center; }
+.z:not(:last-child) { border-right: 1px solid rgba(220,228,245,0.5); }
+.za1{width:260px}.za2{width:240px}.zb1{width:280px}.zb2{width:220px}.zc1{width:200px}.zc2{width:170px}
+.zwm { font-family:'Fraunces',serif; font-size:78px; font-weight:600; color:rgba(30,42,74,0.03); user-select:none; pointer-events:none; letter-spacing:-2px; }
+
+/* Level chips */
+.lchips { position: absolute; top: 0; left: 0; right: 0; display: flex; pointer-events: none; }
+.lc { display: flex; align-items: flex-start; justify-content: center; padding-top: 9px; }
+.lca1{width:260px}.lca2{width:240px}.lcb1{width:280px}.lcb2{width:220px}.lcc1{width:200px}.lcc2{width:170px}
+.lc span { font-size: 10px; font-weight: 700; color: #b8c4d8; letter-spacing: 0.07em; text-transform: uppercase; }
+
+/* SVG */
+.svg-c { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
+
+/* "Du bist hier" */
+.here { position: absolute; top: 0; bottom: 0; pointer-events: none; z-index: 5; }
+.here-line { position: absolute; top: 0; bottom: 0; left: 0; width: 1.5px; background: linear-gradient(to bottom, transparent 0%, rgba(225,29,72,0.22) 10%, rgba(225,29,72,0.22) 90%, transparent 100%); }
+.here-badge { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); background: #e11d48; color: white; font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px; white-space: nowrap; box-shadow: 0 2px 10px rgba(225,29,72,0.38); animation: breathe 2.6s ease-in-out infinite; }
+@keyframes breathe { 0%,100% { box-shadow: 0 2px 10px rgba(225,29,72,0.38); } 50% { box-shadow: 0 2px 18px rgba(225,29,72,0.62); } }
+
+/* ── Nodes (grammar + verb) ── */
+.node { position: absolute; transform: translate(-50%,-50%); display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; z-index: 10; }
+.nc-wrap { position: relative; display: flex; align-items: center; justify-content: center; }
+.nc { border-radius: 50%; flex-shrink: 0; transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.18s; }
+.node:hover .nc { transform: scale(1.2); }
+
+.st-m .nc, .st-a .nc { width: 44px; height: 44px; background: #4a5a7a; box-shadow: 0 2px 10px rgba(74,90,122,0.22); }
+.st-m:hover .nc, .st-a:hover .nc { box-shadow: 0 5px 16px rgba(74,90,122,0.36); }
+.st-m .nl, .st-a .nl { color: #3a4a6a; font-weight: 500; }
+
+.st-o .nc { width: 32px; height: 32px; background: #eaeffa; border: 1.5px solid #a8bcda; }
+.st-o .nl { color: #7a90b2; font-size: 10.5px; }
+
+.st-f .nc { width: 28px; height: 28px; background: #eaeffa; border: 1px solid #b8cadf; opacity: 0.72; }
+.st-f .nl { color: #7a90b2; font-size: 10px; opacity: 0.72; }
+
+.nl { font-size: 10.5px; color: #7a8aa8; white-space: nowrap; text-align: center; line-height: 1.3; max-width: 88px; overflow: hidden; text-overflow: ellipsis; }
+
+/* Ring SVG injected by JS */
+.ring-svg { position: absolute; pointer-events: none; transform: rotate(-90deg); }
+
+/* ── Legend ── */
+.legend { padding: 9px 18px; display: flex; gap: 16px; align-items: center; border-top: 1px solid #dce4f5; background: rgba(240,244,255,0.97); flex-shrink: 0; flex-wrap: wrap; }
+.li { display: flex; align-items: center; gap: 7px; font-size: 11px; color: #7a8aa8; }
+.ld { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.lhint { margin-left: auto; font-size: 10px; color: #b8c4d8; font-style: italic; }
+
+/* ── Vocab View ── */
+.vok-view { flex: 1; display: none; overflow: hidden; }
+.vok-view.on { display: flex; }
+
+/* Vocab theme node: slightly smaller than grammar, same style */
+.vok-t.st-m .nc, .vok-t.st-a .nc { width: 34px; height: 34px; box-shadow: 0 2px 8px rgba(74,90,122,0.2); }
+.vok-t.st-o .nc { width: 26px; height: 26px; }
+.vok-t .nl { font-size: 10px; max-width: 72px; }
+
+/* Vocab word-set nodes (zone circles) */
+.vok-ws .nc { transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1); }
+.vok-ws:hover .nc { transform: scale(1.22); }
+.vok-added .nc { width: 22px; height: 22px; background: #4a5a7a; box-shadow: 0 1px 6px rgba(74,90,122,0.2); }
+.vok-open .nc  { width: 22px; height: 22px; background: #f0f4ff; border: 1.5px solid #ccd6ee; }
+.vok-na .nc    { width: 10px; height: 10px; background: #eef1fb; border: 1px solid #dce4f5; opacity: 0.4; pointer-events: none; }
+
+/* ── Action Sheet ── */
+.as-bd { position: fixed; inset: 0; z-index: 100; display: none; }
+.as-bd.on { display: block; }
+.as { position: fixed; left: 0; right: 0; bottom: -160px; background: white; border-radius: 20px 20px 0 0; z-index: 110; padding: 0 18px max(36px, env(safe-area-inset-bottom)); box-shadow: 0 -6px 30px rgba(30,42,74,0.14); transition: bottom 0.3s cubic-bezier(0.32,0.72,0,1); }
+.as.on { bottom: 0; }
+.ash { width: 36px; height: 4px; background: #e8edf8; border-radius: 2px; margin: 10px auto 16px; }
+.as-title { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 600; margin-bottom: 3px; }
+.as-sub { font-size: 12px; color: #9aaac8; margin-bottom: 15px; }
+.asb { display: flex; align-items: center; gap: 11px; padding: 13px 12px; border-radius: 12px; border: none; background: #e11d48; color: white; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; width: 100%; text-align: left; transition: background 0.15s; margin-bottom: 7px; }
+.asb:hover, .asb:active { background: #c81540; }
+.asb { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.asb-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+.as-cancel { display: flex; justify-content: center; align-items: center; padding: 14px; background: none; border: none; color: #9aaac8; font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; width: 100%; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+
+/* ── Toast ── */
+.toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(16px); background: #1e2a4a; color: white; font-size: 13px; padding: 9px 16px; border-radius: 20px; z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; white-space: nowrap; box-shadow: 0 4px 16px rgba(30,42,74,0.25); }
+.toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+.mockup-bar { position: fixed; top: 0; left: 0; right: 0; background: rgba(30,42,74,0.82); backdrop-filter: blur(8px); color: rgba(255,255,255,0.65); font-size: 11.5px; padding: 7px 20px; text-align: center; z-index: 999; letter-spacing: 0.01em; }
+.mini-lp:active { border-color: #c0ccec; background: #eef1fb; }
+
+/* ── Mobile ── */
+@media (max-width: 600px) {
+  .sidebar { width: 100%; }
+  .chat-area { display: none; }
+  .lp { height: 96vh; height: 96dvh; }
+  .lp-hdr { padding: 10px 14px 10px; }
+  .lp-hdr-controls { gap: 6px; }
+  .lp-title { font-size: 17px; }
+  .lp-meta { font-size: 11px; }
+  .lp-here { font-size: 10.5px; }
+  .lp-tog-btn { padding: 6px 11px; font-size: 11.5px; }
+  .tab { padding: 6px 10px; font-size: 11.5px; }
+  .tab-verb-long { display: none; }
+  .tab-verb-short { display: inline; }
+  .legend { padding: 7px 14px; gap: 12px; }
+}
+@media (min-width: 601px) {
+  .tab-verb-short { display: none; }
+}
+</style>
+</head>
+<body>
+
+
+<div class="app-shell">
+  <div class="sidebar">
+    <div class="sh">
+      <span class="sh-title">Leçons</span>
+      <div class="sh-btns">
+        <button class="hbtn">···</button>
+        <button class="hbtn" id="btn-add">+</button>
+      </div>
+    </div>
+    <div class="sl">
+      <div class="si sel"><div class="sb acc">lr</div><div><div class="sn">La Révision</div><div class="ss">Übungsrunde</div></div></div>
+      <div class="si"><div class="sb">A2<div class="dd"></div></div><div><div class="sn">Passé composé</div><div class="ss">Stufe 4 · fällig</div></div></div>
+      <div class="si"><div class="sb">A2</div><div><div class="sn">Imparfait</div><div class="ss">Stufe 2</div></div></div>
+      <div class="si"><div class="sb" style="font-size:10px;">Vok</div><div><div class="sn">Reisen</div><div class="ss">Stufe 3 · 90 Wörter</div></div></div>
+      <div class="si"><div class="sb" style="font-size:10px;">Vrb</div><div><div class="sn">être / avoir / aller</div><div class="ss">Stufe 5 · gemeistert</div></div></div>
+    </div>
+  </div>
+  <div class="chat-area"></div>
+</div>
+
+<div class="bd" id="bd"></div>
+
+<!-- Add Dialog -->
+<div class="add-dlg" id="add-dlg">
+  <div class="add-dlg-inner">
+    <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:400;margin-bottom:4px;">Neues Thema</div>
+    <div class="mini-lp" id="mini-lp">
+      <div class="mini-lp-hdr">
+        <span style="font-size:11.5px;font-weight:600;color:#1e2a4a;">Lernpfad öffnen</span>
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+          <path d="M9.5 1.5H13.5V5.5" stroke="#e11d48" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M5.5 13.5H1.5V9.5"  stroke="#e11d48" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M13.5 1.5L8.5 6.5"  stroke="#e11d48" stroke-width="1.3" stroke-linecap="round"/>
+          <path d="M1.5 13.5L6.5 8.5"  stroke="#e11d48" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="mini-svg-wrap">
+        <svg id="mini-svg" width="100%" height="100" preserveAspectRatio="xMidYMid meet" style="display:block;"></svg>
+      </div>
+    </div>
+    <button class="ab"><div class="ab-icon">📖</div>Grammatikthema</button>
+    <button class="ab"><div class="ab-icon">📝</div>Vokabelgruppe</button>
+    <button class="ab"><div class="ab-icon">⚡</div>Verbfamilie</button>
+    <button id="btn-dlg-cancel" style="padding:9px;border-radius:8px;border:1px solid #dce4f5;background:transparent;color:#5a6a8a;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;">Abbrechen</button>
+  </div>
+</div>
+
+<!-- Main Panel -->
+<div class="lp" id="lp">
+  <div class="lp-handle"></div>
+  <div class="lp-hdr">
+    <div class="lp-hdr-top">
+      <div>
+        <div class="lp-title">Lernpfad</div>
+        <div class="lp-meta" id="lp-meta">–</div>
+        <div class="lp-here"><div class="lp-here-dot"></div><span id="lp-here-text">–</span></div>
+      </div>
+      <button class="close-btn" id="btn-close-lp">✕</button>
+    </div>
+    <div class="lp-hdr-controls">
+      <div class="lp-toggle">
+        <button class="lp-tog-btn on" data-view="gram">Grammatik &amp; Verben</button>
+        <button class="lp-tog-btn"    data-view="vok">Vokabeln</button>
+      </div>
+      <div class="tabs" id="gram-tabs">
+        <button class="tab on" data-filter="all">Alle</button>
+        <button class="tab"    data-filter="gram">Grammatik</button>
+        <button class="tab"    data-filter="verb"><span class="tab-verb-long">Unregelmäßige Verben</span><span class="tab-verb-short">Irr. Verben</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ Grammatik & Verben View ══ -->
+  <div class="gram-view" id="gram-view">
+    <div class="c-scroll" id="c-scroll">
+      <div class="canvas" id="canvas">
+
+        <div class="zones">
+          <div class="z za1"><span class="zwm">A1</span></div>
+          <div class="z za2"><span class="zwm">A2</span></div>
+          <div class="z zb1"><span class="zwm">B1</span></div>
+          <div class="z zb2"><span class="zwm">B2</span></div>
+          <div class="z zc1"><span class="zwm">C1</span></div>
+          <div class="z zc2"><span class="zwm">C2</span></div>
+        </div>
+        <div class="lchips">
+          <div class="lc lca1"><span>A1</span></div>
+          <div class="lc lca2"><span>A2</span></div>
+          <div class="lc lcb1"><span>B1</span></div>
+          <div class="lc lcb2"><span>B2</span></div>
+          <div class="lc lcc1"><span>C1</span></div>
+          <div class="lc lcc2"><span>C2</span></div>
+        </div>
+        <svg class="svg-c" id="svg-c" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div class="here" id="here" style="left:0;width:1px;"><div class="here-line"></div><div class="here-badge">Du bist hier</div></div>
+
+        <!-- ═══ GRAMMATIK ═══  (y: 265–545) -->
+        <div class="node st-m" data-x="88"  data-y="278" data-cat="gram" data-topic="Artikel"                       data-level="A1" data-srs="5" data-id="artikel"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Artikel</div></div>
+        <div class="node st-m" data-x="158" data-y="358" data-cat="gram" data-topic="Présent"                       data-level="A1" data-srs="5" data-id="present"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Présent</div></div>
+        <div class="node st-m" data-x="72"  data-y="448" data-cat="gram" data-topic="Verneinung"                    data-level="A1" data-srs="5" data-id="negation"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Négation</div></div>
+        <div class="node st-m" data-x="208" data-y="308" data-cat="gram" data-topic="Personalpronomen"              data-level="A1" data-srs="5" data-id="pronoms-sujets"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Pronoms</div></div>
+        <div class="node st-a" data-x="130" data-y="508" data-cat="gram" data-topic="Zahlen"                        data-level="A1" data-srs="3" data-id="nombres"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Nombres</div></div>
+        <div class="node st-o" data-x="178" data-y="478" data-cat="gram" data-topic="Teilungsartikel"               data-level="A1" data-id="articles-partitifs"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Art. partitifs</div></div>
+
+        <div class="node st-a" data-x="308" data-y="268" data-cat="gram" data-topic="Passé composé (avoir)"        data-level="A2" data-srs="4" data-id="pc-avoir"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Passé c. avoir</div></div>
+        <div class="node st-a" data-x="390" data-y="345" data-cat="gram" data-topic="Passé composé (être)"         data-level="A2" data-srs="3" data-id="pc-etre"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Passé c. être</div></div>
+        <div class="node st-a" data-x="278" data-y="435" data-cat="gram" data-topic="Imparfait"                    data-level="A2" data-srs="2" data-id="imparfait"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Imparfait</div></div>
+        <div class="node st-a" data-x="415" data-y="465" data-cat="gram" data-topic="Futur proche"                 data-level="A2" data-srs="1" data-id="futur-proche"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Futur proche</div></div>
+        <div class="node st-o" data-x="330" data-y="528" data-cat="gram" data-topic="Fragesätze"                   data-level="A2" data-id="questions"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Questions</div></div>
+        <div class="node st-o" data-x="460" data-y="298" data-cat="gram" data-topic="Adjektivangleichung"          data-level="A2" data-id="adj-accord"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Adj. Angleichung</div></div>
+        <div class="node st-o" data-x="310" data-y="368" data-cat="gram" data-topic="Objektpronomen (COD/COI)"     data-level="A2" data-id="pronoms-cod-coi"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Pronoms COD/COI</div></div>
+        <div class="node st-o" data-x="462" data-y="378" data-cat="gram" data-topic="Reflexivverben"               data-level="A2" data-id="reflexifs"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Verbes réfléchis</div></div>
+        <div class="node st-o" data-x="375" data-y="498" data-cat="gram" data-topic="Imperativ"                    data-level="A2" data-id="imperatif"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Impératif</div></div>
+
+        <div class="node st-o" data-x="548" data-y="265" data-cat="gram" data-topic="Konjunktiv Präsens"           data-level="B1" data-id="subjonctif-present"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Subjonctif prés.</div></div>
+        <div class="node st-o" data-x="638" data-y="345" data-cat="gram" data-topic="Konditional I"                data-level="B1" data-id="conditionnel-present"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Conditionnel prés.</div></div>
+        <div class="node st-o" data-x="748" data-y="288" data-cat="gram" data-topic="Futur I"                      data-level="B1" data-id="futur-simple"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Futur simple</div></div>
+        <div class="node st-o" data-x="528" data-y="435" data-cat="gram" data-topic="Relativpronomen"              data-level="B1" data-id="pronoms-relatifs"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Pronoms relatifs</div></div>
+        <div class="node st-o" data-x="680" data-y="465" data-cat="gram" data-topic="Komparativ &amp; Superlativ" data-level="B1" data-id="comparatif"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Comparatif</div></div>
+        <div class="node st-o" data-x="595" data-y="535" data-cat="gram" data-topic="Indirekte Rede"               data-level="B1" data-id="discours-indirect"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Discours indirect</div></div>
+        <div class="node st-o" data-x="612" data-y="408" data-cat="gram" data-topic="Pronomen y und en"            data-level="B1" data-id="pronoms-y-en"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Pronoms y / en</div></div>
+        <div class="node st-o" data-x="735" data-y="475" data-cat="gram" data-topic="Bedingungssätze (si)"         data-level="B1" data-id="phrases-si"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Phrases en si</div></div>
+
+        <div class="node st-o" data-x="832" data-y="268" data-cat="gram" data-topic="Plusquamperfekt"              data-level="B2" data-id="pluperfect"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Plus-que-parfait</div></div>
+        <div class="node st-o" data-x="912" data-y="348" data-cat="gram" data-topic="Konditional II"               data-level="B2" data-id="conditionnel-passe"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Conditionnel passé</div></div>
+        <div class="node st-o" data-x="822" data-y="445" data-cat="gram" data-topic="Gerundium"                    data-level="B2" data-id="gerondif"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Gérondif</div></div>
+        <div class="node st-o" data-x="960" data-y="435" data-cat="gram" data-topic="Passiv"                       data-level="B2" data-id="passif"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Voix passive</div></div>
+        <div class="node st-o" data-x="888" data-y="532" data-cat="gram" data-topic="Konjunktiv Vergangenheit"     data-level="B2" data-id="subjonctif-passe"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Subjonctif passé</div></div>
+        <div class="node st-o" data-x="968" data-y="285" data-cat="gram" data-topic="Zeitenfolge"                  data-level="B2" data-id="concordance"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Concordance</div></div>
+
+        <div class="node st-f" data-x="1055" data-y="278" data-cat="gram" data-topic="Partizip Präsens"            data-level="C1" data-id="participe-present"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Participe prés.</div></div>
+        <div class="node st-f" data-x="1110" data-y="385" data-cat="gram" data-topic="Konjunktiv Imperfekt"        data-level="C1" data-id="subjonctif-imparfait"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Subj. imparfait</div></div>
+        <div class="node st-f" data-x="1060" data-y="498" data-cat="gram" data-topic="Gehobene Sprache"            data-level="C1" data-id="style-soutenu"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Style soutenu</div></div>
+        <div class="node st-f" data-x="1162" data-y="282" data-cat="gram" data-topic="Zus. Relativpronomen"        data-level="C1" data-id="pronoms-relatifs-comp"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Rel.-pron. comp.</div></div>
+        <div class="node st-f" data-x="1255" data-y="335" data-cat="gram" data-topic="Konjunktiv Plusquamperfekt"  data-level="C2" data-id="subjonctif-plqpf"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Subj. plqpf.</div></div>
+        <div class="node st-f" data-x="1295" data-y="458" data-cat="gram" data-topic="Sprachregister"              data-level="C2" data-id="registres"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">Registres</div></div>
+
+        <!-- ═══ VERBEN Reihe 1: A1 + A2 + B1 (oben) ═══ -->
+        <div class="node st-m is-verb" data-x="100" data-y="566" data-cat="verb" data-topic="être, avoir, aller"             data-level="A1" data-srs="5" data-id="verb-etre-avoir-aller"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">être / avoir / aller</div></div>
+        <div class="node st-a is-verb" data-x="190" data-y="572" data-cat="verb" data-topic="dormir, partir, sortir …"       data-level="A1" data-srs="2" data-id="verb-dormir-partir"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">dormir, partir …</div></div>
+        <div class="node st-a is-verb" data-x="312" data-y="566" data-cat="verb" data-topic="venir, tenir und Verwandte"     data-level="A2" data-srs="2" data-id="verb-venir-tenir"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">venir, tenir …</div></div>
+        <div class="node st-o is-verb" data-x="400" data-y="572" data-cat="verb" data-topic="pouvoir, vouloir, savoir, faire, dire …" data-level="A2" data-id="verb-hochfrequenz"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">pouvoir, vouloir …</div></div>
+        <div class="node st-o is-verb" data-x="474" data-y="566" data-cat="verb" data-topic="prendre und Verwandte"           data-level="A2" data-id="verb-prendre"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">prendre …</div></div>
+        <div class="node st-o is-verb" data-x="548" data-y="562" data-cat="verb" data-topic="voir, recevoir und Verwandte"   data-level="B1" data-id="verb-voir-recevoir"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">voir, recevoir …</div></div>
+        <div class="node st-o is-verb" data-x="630" data-y="568" data-cat="verb" data-topic="mettre und Verwandte"           data-level="B1" data-id="verb-mettre"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">mettre …</div></div>
+        <div class="node st-o is-verb" data-x="714" data-y="562" data-cat="verb" data-topic="Verben auf -ire und -uire"      data-level="B1" data-id="verb-ire"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">-ire / -uire</div></div>
+
+        <!-- ═══ VERBEN Reihe 2: B1 (unten) ═══ -->
+        <div class="node st-o is-verb" data-x="524" data-y="618" data-cat="verb" data-topic="Verben auf -aître und -oître"   data-level="B1" data-id="verb-aitre"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">-aître / -oître</div></div>
+        <div class="node st-o is-verb" data-x="604" data-y="622" data-cat="verb" data-topic="boire, croire"                  data-level="B1" data-id="verb-boire-croire"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">boire, croire</div></div>
+        <div class="node st-o is-verb" data-x="686" data-y="618" data-cat="verb" data-topic="Verben ohne Muster (fuir, haïr, cueillir …)" data-level="B1" data-id="verb-einzelgaenger"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">fuir, haïr …</div></div>
+        <div class="node st-o is-verb" data-x="764" data-y="622" data-cat="verb" data-topic="ouvrir und Verwandte (couvrir, offrir, souffrir)" data-level="B1" data-id="verb-ouvrir"><div class="nc-wrap"><div class="nc"></div></div><div class="nl">ouvrir …</div></div>
+
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="li">
+        <div style="position:relative;width:14px;height:14px;flex-shrink:0;">
+          <div class="ld" style="background:#4a5a7a;width:10px;height:10px;position:absolute;top:2px;left:2px;"></div>
+          <svg style="position:absolute;inset:0;" viewBox="-7 -7 14 14" width="14" height="14"><circle cx="0" cy="0" r="6" fill="none" stroke="#22c55e" stroke-width="2.5"/></svg>
+        </div>Gemeistert
+      </div>
+      <div class="li">
+        <div style="position:relative;width:14px;height:14px;flex-shrink:0;">
+          <div class="ld" style="background:#4a5a7a;width:10px;height:10px;position:absolute;top:2px;left:2px;"></div>
+          <svg style="position:absolute;inset:0;" viewBox="-7 -7 14 14" width="14" height="14"><circle cx="0" cy="0" r="6" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-dasharray="12 7" transform="rotate(-90)"/></svg>
+        </div>Aktiv
+      </div>
+      <div class="li"><div class="ld" style="background:#f0f4ff;border:1.5px solid #ccd6ee;width:10px;height:10px;border-radius:50%;"></div>Offen</div>
+      <div class="lhint">→ scrollen für C1/C2</div>
+    </div>
+  </div>
+
+  <!-- ══ Vokabeln View (built by JS) ══ -->
+  <div class="vok-view" id="vok-view"></div>
+
+</div><!-- /.lp -->
+
+<!-- Action Sheet -->
+<div class="as-bd" id="as-bd"></div>
+<div class="as" id="as">
+  <div class="ash"></div>
+  <div class="as-title" id="as-title">–</div>
+  <div class="as-sub"   id="as-sub">–</div>
+  <p class="as-desc" id="as-desc"></p>
+  <button class="asb" id="asb-main"><div class="asb-icon" id="asb-icon">+</div><span id="asb-label">Jetzt anlegen</span></button>
+  <button class="as-cancel" id="btn-as-cancel">Abbrechen</button>
+</div>
+
+<div class="toast" id="toast"></div>
+<div id="tip"></div>
+
+<script>
+// ─── Y-Offset (Leerraum oben reduzieren) ─────────────────────────────────────
+const Y_OFF = 210;
+
+// ─── Position grammar nodes ───────────────────────────────────────────────────
+document.querySelectorAll('.node[data-x]').forEach(n => {
+  n.style.left = n.dataset.x + 'px';
+  n.style.top  = (+n.dataset.y - Y_OFF) + 'px';
+});
+
+// ─── Progress rings ───────────────────────────────────────────────────────────
+function addRing(node, circleR, strokeW) {
+  circleR = circleR || 27;
+  strokeW = strokeW || 3.5;
+  const isMastered = node.classList.contains('st-m');
+  const srs        = isMastered ? 5 : Math.max(1, Math.min(5, parseInt(node.dataset.srs || 1)));
+  const circ       = 2 * Math.PI * circleR;
+  const filled     = (srs / 5) * circ;
+  const size       = 2 * (circleR + strokeW + 2);
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.classList.add('ring-svg');
+  svg.setAttribute('width', size); svg.setAttribute('height', size);
+  svg.setAttribute('viewBox', `${-(circleR+strokeW+2)} ${-(circleR+strokeW+2)} ${size} ${size}`);
+  svg.style.width = size + 'px'; svg.style.height = size + 'px';
+
+  const bg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  bg.setAttribute('cx',0); bg.setAttribute('cy',0); bg.setAttribute('r',circleR);
+  bg.setAttribute('fill','none'); bg.setAttribute('stroke','rgba(34,197,94,0.15)'); bg.setAttribute('stroke-width',strokeW);
+  svg.appendChild(bg);
+
+  const fg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  fg.setAttribute('cx',0); fg.setAttribute('cy',0); fg.setAttribute('r',circleR);
+  fg.setAttribute('fill','none'); fg.setAttribute('stroke','#22c55e'); fg.setAttribute('stroke-width',strokeW);
+  fg.setAttribute('stroke-linecap','round');
+  if (!isMastered) fg.setAttribute('stroke-dasharray', `${filled} ${circ}`);
+  svg.appendChild(fg);
+
+  const wrap = node.querySelector('.nc-wrap');
+  wrap.style.width = size + 'px'; wrap.style.height = size + 'px';
+  wrap.appendChild(svg);
+}
+
+document.querySelectorAll('.node.st-m, .node.st-a').forEach(n => addRing(n));
+
+// ─── Grammar connection lines ─────────────────────────────────────────────────
+const GRAM_CONNS = [
+  ['artikel','present'],['artikel','pronoms-sujets'],
+  ['present','negation'],['present','pc-avoir'],['present','futur-proche'],
+  ['pronoms-sujets','pc-avoir'],
+  ['verb-etre-avoir-aller','pc-avoir'],['verb-etre-avoir-aller','verb-dormir-partir'],
+  ['verb-etre-avoir-aller','verb-venir-tenir'],['verb-etre-avoir-aller','verb-hochfrequenz'],
+  ['pc-avoir','pc-etre'],['pc-avoir','imparfait'],['pc-avoir','subjonctif-present'],
+  ['imparfait','conditionnel-present'],['imparfait','pluperfect'],
+  ['subjonctif-present','subjonctif-passe'],['conditionnel-present','conditionnel-passe'],
+  ['adj-accord','comparatif'],
+  ['artikel','articles-partitifs'],['negation','articles-partitifs'],
+  ['pronoms-sujets','pronoms-cod-coi'],['pc-avoir','pronoms-cod-coi'],
+  ['pronoms-cod-coi','pronoms-y-en'],['pronoms-cod-coi','pronoms-relatifs'],
+  ['present','imperatif'],['reflexifs','pc-etre'],
+  ['imparfait','phrases-si'],['phrases-si','conditionnel-present'],
+  ['verb-hochfrequenz','verb-prendre'],['verb-hochfrequenz','verb-voir-recevoir'],['verb-hochfrequenz','verb-mettre'],
+];
+
+function getPos(id) {
+  const n = document.querySelector(`.node[data-id="${id}"]`);
+  if (!n) return null;
+  return { x: +n.dataset.x, y: +n.dataset.y };
+}
+
+const svgC = document.getElementById('svg-c');
+
+GRAM_CONNS.forEach(([a, b]) => {
+  const pa = getPos(a), pb = getPos(b);
+  if (!pa || !pb) return;
+  const mx = (pa.x + pb.x) / 2;
+  const pay = pa.y - Y_OFF, pby = pb.y - Y_OFF;
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', `M${pa.x},${pay} C${mx},${pay} ${mx},${pby} ${pb.x},${pby}`);
+  path.setAttribute('stroke', 'rgba(74,90,122,0.1)');
+  path.setAttribute('stroke-width', '1.5');
+  path.setAttribute('fill', 'none');
+  path.setAttribute('stroke-dasharray', '4 5');
+  svgC.appendChild(path);
+});
+
+// ─── "Du bist hier" ──────────────────────────────────────────────────────────
+const ZONE_LEFTS  = { A1:0,   A2:260, B1:500, B2:780,  C1:1000, C2:1200 };
+const ZONE_RIGHTS = { A1:260, A2:500, B1:780, B2:1000, C1:1200, C2:1370 };
+const ZONE_ORDER  = ['A1','A2','B1','B2','C1','C2'];
+
+function computeHere() {
+  const scores = {};
+  ZONE_ORDER.forEach(l => scores[l] = { pts:0, total:0 });
+  const all = [...document.querySelectorAll('.node[data-level]')];
+  all.forEach(n => {
+    const lvl = n.dataset.level;
+    if (!scores[lvl]) return;
+    scores[lvl].total++;
+    if (n.classList.contains('st-m')) scores[lvl].pts += 1.0;
+    else if (n.classList.contains('st-a')) scores[lvl].pts += 0.2 + (+n.dataset.srs||1)/5*0.5;
+  });
+  let hereLevel = 'A1';
+  for (const l of ZONE_ORDER) {
+    const s = scores[l];
+    if (s.total > 0 && s.pts/s.total >= 0.3) hereLevel = l;
+    else break;
+  }
+  const s = scores[hereLevel];
+  const progress = s.total > 0 ? Math.min(s.pts/s.total, 1) : 0;
+  const x = Math.round(ZONE_LEFTS[hereLevel] + progress * (ZONE_RIGHTS[hereLevel] - ZONE_LEFTS[hereLevel]));
+  document.getElementById('here').style.left = x + 'px';
+  const next = ZONE_ORDER[ZONE_ORDER.indexOf(hereLevel)+1] || 'C2';
+  document.getElementById('lp-here-text').textContent = `Du bist bei ${hereLevel} · nächste Stufe: ${next}`;
+  let mastered=0, active=0, open=0;
+  all.forEach(n => {
+    if (n.classList.contains('st-m')) mastered++;
+    else if (n.classList.contains('st-a')) active++;
+    else open++;
+  });
+  document.getElementById('lp-meta').textContent = `${mastered+active+open} Themen · ${mastered} gemeistert · ${active} aktiv`;
+  return x;
+}
+const hereX = computeHere();
+
+// ─── Miniatur SVG ──────────────────────────────────────────────────────────────
+function buildMini() {
+  const mini = document.getElementById('mini-svg');
+  while (mini.firstChild) mini.removeChild(mini.firstChild);
+
+  // ViewBox: Element ~3:1 → vbW = vbH * 3 damit meet ohne Letterboxing skaliert
+  const vbH = 360, vbW = vbH * 3, vbY = 245;
+  const vbX = Math.max(0, Math.min(hereX - vbW * 0.2, 1370 - vbW));
+  mini.setAttribute('viewBox', `${vbX} ${vbY} ${vbW} ${vbH}`);
+
+  // Zonentrennlinien (volle Canvashöhe, außerhalb viewBox unsichtbar)
+  [260,500,780,1000,1200].forEach(x => {
+    const l = document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.setAttribute('x1',x); l.setAttribute('y1',0); l.setAttribute('x2',x); l.setAttribute('y2',640);
+    l.setAttribute('stroke','rgba(220,228,245,0.6)'); l.setAttribute('stroke-width','2');
+    mini.appendChild(l);
+  });
+
+  // Zonen-Wasserzeichen
+  const zLabels = { A1:130, A2:380, B1:640, B2:890, C1:1100, C2:1285 };
+  Object.entries(zLabels).forEach(([l,x]) => {
+    const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',x); t.setAttribute('y',430); t.setAttribute('text-anchor','middle');
+    t.setAttribute('font-family','Fraunces,serif'); t.setAttribute('font-size','110');
+    t.setAttribute('fill','rgba(30,42,74,0.032)'); t.setAttribute('font-weight','600');
+    t.textContent = l; mini.appendChild(t);
+  });
+
+  // Verbindungslinien
+  GRAM_CONNS.forEach(([a,b]) => {
+    const pa=getPos(a), pb=getPos(b); if(!pa||!pb) return;
+    const mx=(pa.x+pb.x)/2;
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d',`M${pa.x},${pa.y} C${mx},${pa.y} ${mx},${pb.y} ${pb.x},${pb.y}`);
+    p.setAttribute('stroke','rgba(74,90,122,0.12)'); p.setAttribute('stroke-width','5');
+    p.setAttribute('fill','none'); p.setAttribute('stroke-dasharray','8 10');
+    mini.appendChild(p);
+  });
+
+  // "Du bist hier"-Linie
+  const hl = document.createElementNS('http://www.w3.org/2000/svg','line');
+  hl.setAttribute('x1',hereX); hl.setAttribute('y1',0); hl.setAttribute('x2',hereX); hl.setAttribute('y2',640);
+  hl.setAttribute('stroke','rgba(225,29,72,0.35)'); hl.setAttribute('stroke-width','4');
+  mini.appendChild(hl);
+
+  // Nodes
+  document.querySelectorAll('.node[data-x]').forEach(n => {
+    const cx=+n.dataset.x, cy=+n.dataset.y;
+    let fill, stroke='none', r;
+    if (n.classList.contains('st-m'))      { fill='#4a5a7a'; r=18; }
+    else if (n.classList.contains('st-a')) { fill='#4a5a7a'; r=16; }
+    else if (n.classList.contains('st-f')) { fill='#eaeffa'; stroke='#b8cadf'; r=10; }
+    else                                   { fill='#eaeffa'; stroke='#a8bcda'; r=12; }
+    if (n.classList.contains('st-m') || n.classList.contains('st-a')) {
+      const isMastered = n.classList.contains('st-m');
+      const srs = isMastered ? 5 : Math.max(1, Math.min(5, +n.dataset.srs||1));
+      const ringR=r+5, circ=2*Math.PI*ringR, filled=(srs/5)*circ;
+      const ring = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      ring.setAttribute('cx',cx); ring.setAttribute('cy',cy); ring.setAttribute('r',ringR);
+      ring.setAttribute('fill','none'); ring.setAttribute('stroke','#22c55e'); ring.setAttribute('stroke-width','3.5');
+      ring.setAttribute('stroke-linecap','round');
+      if (!isMastered) ring.setAttribute('stroke-dasharray',`${filled} ${circ}`);
+      ring.setAttribute('transform',`rotate(-90 ${cx} ${cy})`);
+      mini.appendChild(ring);
+    }
+    const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',cx); c.setAttribute('cy',cy); c.setAttribute('r',r); c.setAttribute('fill',fill);
+    if (stroke!=='none') { c.setAttribute('stroke',stroke); c.setAttribute('stroke-width','3'); }
+    mini.appendChild(c);
+  });
+}
+buildMini();
+
+// ─── Segmented ring (for vocab zone circles) ──────────────────────────────────
+function addSegmentedRingToSvg(svgEl, cx, cy, r, segments, strokeW) {
+  const n = segments.length;
+  if (!n) return;
+  const C = 2 * Math.PI * r;
+  const gap = n > 1 ? Math.min(4, C / n * 0.18) : 0;
+  const arc = C / n - gap;
+  const halfGapAngle = (gap / 2 / C) * 360;
+  segments.forEach((isAdded, i) => {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    el.setAttribute('cx', cx); el.setAttribute('cy', cy); el.setAttribute('r', r);
+    el.setAttribute('fill', 'none');
+    el.setAttribute('stroke', isAdded ? '#22c55e' : 'rgba(34,197,94,0.2)');
+    el.setAttribute('stroke-width', strokeW);
+    el.setAttribute('stroke-linecap', 'round');
+    el.setAttribute('stroke-dasharray', `${arc} ${C - arc}`);
+    el.setAttribute('transform', `rotate(${-90 + i * (360 / n) + halfGapAngle} ${cx} ${cy})`);
+    svgEl.appendChild(el);
+  });
+}
+
+// ─── Vocab Constellation Data ─────────────────────────────────────────────────
+const VOK_LAYOUT = {
+  themeX: 40,
+  zoneX: { A1:130, A2:380, B1:640, B2:890, C1:1100 },
+};
+
+const VOK_CUSTOM = [
+  { name: 'Eigene Vokabeln', words: 23, due: 4,  level: 2, isCustom: true },
+];
+const VOK_ZONES_ORDER = ['A1','A2','B1','B2','C1'];
+
+// Theme ring: circleR=17 matches the 34px nc circle (radius 17)
+const VOK_RING_R = 17;
+const VOK_RING_W = 2.2;
+
+// Sub-level counts per CECR zone (how many groups exist for each zone)
+const ZONE_SUBLEVELS = { A1: 3, A2: 2, B1: 2, B2: 2, C1: 2 };
+
+// zones: { [zone]: boolean[] } – one boolean per sub-level (true = added)
+const VOK_THEMES = [
+  { name:'Reisen',       words:90,  due:12, level:3, zones:{ A1:[true,true,false], A2:[true,false]    } },
+  { name:'Familie',      words:45,  due:0,  level:5, zones:{ A1:[true,true,true]                      } },
+  { name:'Essen',        words:42,  due:5,  level:4, zones:{ A1:[true,true,false]                     } },
+  { name:'Körper',       words:30,  due:8,  level:2, zones:{ A1:[true,false,false]                    } },
+  { name:'Wohnen',       words:0,   due:0,  level:0, zones:{}                                           },
+  { name:'Arbeit',       words:0,   due:0,  level:0, zones:{}                                           },
+  { name:'Natur',        words:0,   due:0,  level:0, zones:{}                                           },
+  { name:'Freizeit',     words:0,   due:0,  level:0, zones:{}                                           },
+  { name:'Gesellschaft', words:0,   due:0,  level:0, zones:{},  naZones:['A1','A2','B1']                },
+  { name:'Abstrakt',     words:0,   due:0,  level:0, zones:{},  naZones:['A1','A2','B1','B2']           },
+];
+
+// ─── Build Vocab Canvas ───────────────────────────────────────────────────────
+function buildVokCanvas() {
+  const CUSTOM_H     = 150;                // Höhe des Eigene-Gruppen-Bereichs
+  const SEP_H        = 28;                 // Trennbereich
+  const PRED_Y       = CUSTOM_H + SEP_H;  // Ab hier: vorgefertigte Gruppen
+  const ROW_SPACING  = 72;
+  const ROW_START    = PRED_Y + 90;        // Erste Zeile (nach Level-Chip + Label + Luft)
+  const canvasH      = ROW_START + VOK_THEMES.length * ROW_SPACING + 50;
+
+  const container = document.getElementById('vok-view');
+  container.innerHTML = '';
+  const scrl = document.createElement('div');
+  scrl.className = 'c-scroll vok-scroll';
+  const cnv = document.createElement('div');
+  cnv.className = 'canvas';
+  cnv.style.height = cnv.style.minHeight = canvasH + 'px';
+
+  // Zonen-Spalten + Level-Chips NUR im Bereich der vorgefertigten Gruppen
+  cnv.innerHTML = `
+    <div class="zones" style="position:absolute;top:${PRED_Y}px;left:0;right:0;bottom:0;">
+      <div class="z za1"><span class="zwm">A1</span></div>
+      <div class="z za2"><span class="zwm">A2</span></div>
+      <div class="z zb1"><span class="zwm">B1</span></div>
+      <div class="z zb2"><span class="zwm">B2</span></div>
+      <div class="z zc1"><span class="zwm">C1</span></div>
+      <div class="z zc2"><span class="zwm">C2</span></div>
+    </div>
+    <div class="lchips" style="position:absolute;top:${PRED_Y}px;left:0;right:0;">
+      <div class="lc lca1"><span>A1</span></div>
+      <div class="lc lca2"><span>A2</span></div>
+      <div class="lc lcb1"><span>B1</span></div>
+      <div class="lc lcb2"><span>B2</span></div>
+      <div class="lc lcc1"><span>C1</span></div>
+      <div class="lc lcc2"><span>C2</span></div>
+    </div>`;
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.className = 'svg-c';
+  svg.setAttribute('viewBox', `0 0 1370 ${canvasH}`);
+  svg.style.height = canvasH + 'px';
+  cnv.appendChild(svg);
+
+  function addSecLabel(text, y) {
+    const el = document.createElement('div');
+    el.className = 'vok-sec';
+    el.textContent = text;
+    el.style.cssText = `position:absolute;left:0;top:${y}px;width:100%;padding-left:10px;z-index:20;pointer-events:none;`;
+    cnv.appendChild(el);
+  }
+
+  // ── EIGENE GRUPPEN: groß, horizontal, mittig ──
+  addSecLabel('Eigene Gruppen', 10);
+  const custCY = CUSTOM_H / 2 + 8;
+  VOK_CUSTOM.forEach((theme, i) => {
+    const cx = 80 + i * 130;
+    const isStarted = theme.level > 0, isMastered = theme.level === 5;
+    const stClass = isMastered ? 'st-m' : isStarted ? 'st-a' : 'st-o';
+    const thNode = document.createElement('div');
+    thNode.className = `node ${stClass} vok-t vok-cust`;
+    thNode.style.left = cx + 'px';
+    thNode.style.top  = custCY + 'px';
+    if (isStarted) thNode.dataset.srs = theme.level;
+    thNode.innerHTML = `<div class="nc-wrap"><div class="nc"></div></div><div class="nl">${theme.name}</div>`;
+    cnv.appendChild(thNode);
+    if (isStarted) addRing(thNode, 26, 3);
+    attachTooltip(thNode, () => {
+      if (!isStarted) return `${theme.name} · Noch keine Wörter`;
+      return `${theme.name} · Stufe ${theme.level} · ${theme.words} Wörter${theme.due > 0 ? ' · ' + theme.due + ' fällig' : ''}`;
+    });
+    thNode.addEventListener('click', () =>
+      openSheet(theme.name, isStarted ? `${theme.words} Wörter · Stufe ${theme.level}` : 'Noch keine Wörter', VOK_DESC[theme.name]||'', isStarted));
+  });
+
+  // Trennlinie
+  const sep = document.createElementNS('http://www.w3.org/2000/svg','line');
+  sep.setAttribute('x1',0); sep.setAttribute('y1',CUSTOM_H); sep.setAttribute('x2',1370); sep.setAttribute('y2',CUSTOM_H);
+  sep.setAttribute('stroke','rgba(220,228,245,0.9)'); sep.setAttribute('stroke-width','1.5');
+  svg.appendChild(sep);
+
+  // ── VORGEFERTIGTE GRUPPEN ──
+  addSecLabel('Vorgefertigte Gruppen', PRED_Y + 30);
+
+  // "Du bist hier"-Indikator: rechteste Zone mit mindestens einer Gruppe
+  const zonesOrder = ['A1','A2','B1','B2','C1'];
+  let hereZone = null;
+  zonesOrder.forEach(z => { if (VOK_THEMES.some(t => t.zones[z] && t.zones[z].some(Boolean))) hereZone = z; });
+  if (hereZone) {
+    const hx = VOK_LAYOUT.zoneX[hereZone];
+    const hl = document.createElementNS('http://www.w3.org/2000/svg','line');
+    hl.setAttribute('x1',hx); hl.setAttribute('y1',PRED_Y); hl.setAttribute('x2',hx); hl.setAttribute('y2',canvasH);
+    hl.setAttribute('stroke','rgba(225,29,72,0.22)'); hl.setAttribute('stroke-width','1.5');
+    svg.appendChild(hl);
+    const badge = document.createElement('div');
+    badge.style.cssText = `position:absolute;left:${hx}px;top:${PRED_Y+10}px;transform:translateX(-50%);background:#e11d48;color:white;font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;white-space:nowrap;box-shadow:0 2px 10px rgba(225,29,72,0.38);animation:breathe 2.6s ease-in-out infinite;z-index:5;pointer-events:none;`;
+    badge.textContent = 'Du bist hier';
+    cnv.appendChild(badge);
+  }
+
+  // ── Vorgefertigte Zeilen ──
+  VOK_THEMES.forEach((theme, i) => {
+    const y = ROW_START + i * ROW_SPACING;
+    const isStarted = theme.level > 0, isMastered = theme.level === 5;
+    const stClass = isMastered ? 'st-m' : isStarted ? 'st-a' : 'st-o';
+    const thNode = document.createElement('div');
+    thNode.className = `node ${stClass} vok-t`;
+    thNode.style.left = VOK_LAYOUT.themeX + 'px';
+    thNode.style.top  = y + 'px';
+    if (isStarted) thNode.dataset.srs = theme.level;
+    thNode.innerHTML = `<div class="nc-wrap"><div class="nc"></div></div><div class="nl">${theme.name}</div>`;
+    cnv.appendChild(thNode);
+    if (isStarted) addRing(thNode, VOK_RING_R, VOK_RING_W);
+    attachTooltip(thNode, () => {
+      if (!isStarted) return `${theme.name} · Noch keine Wörter`;
+      return `${theme.name} · Stufe ${theme.level} · ${theme.words} Wörter${theme.due > 0 ? ' · ' + theme.due + ' fällig' : ''}`;
+    });
+    thNode.addEventListener('click', () =>
+      openSheet(theme.name, isStarted ? `${theme.words} Wörter · Stufe ${theme.level}` : 'Noch keine Wörter', VOK_DESC[theme.name]||'', isStarted));
+
+    VOK_ZONES_ORDER.forEach(zone => {
+      const isNA = theme.naZones && theme.naZones.includes(zone);
+      const subArr = theme.zones[zone] || [];
+      const addedCount = subArr.filter(Boolean).length;
+      const totalAvail = subArr.length || ZONE_SUBLEVELS[zone] || 2;
+      const isAdded   = addedCount > 0 && addedCount === subArr.length;
+      const isPartial = addedCount > 0 && addedCount < subArr.length;
+      const hasAny    = isAdded || isPartial;
+      const x = VOK_LAYOUT.zoneX[zone];
+      const wsn = document.createElement('div');
+      wsn.className = `node vok-ws ${isNA ? 'vok-na' : hasAny ? 'vok-added' : 'vok-open'}`;
+      wsn.style.left = x + 'px'; wsn.style.top = y + 'px';
+      wsn.innerHTML = `<div class="nc-wrap"><div class="nc"></div></div>`;
+      if (!isNA) {
+        // Segmented ring: only for zones with sub-levels started
+        if (subArr.length > 0) addSegmentedRingToSvg(svg, x, y, 14, subArr, 2.5);
+        attachTooltip(wsn, () => {
+          if (isAdded)   return `${theme.name} · ${zone} · ${addedCount}/${subArr.length} · vollständig`;
+          if (isPartial) return `${theme.name} · ${zone} · ${addedCount}/${subArr.length} Einheiten`;
+          return `${theme.name} · ${zone} hinzufügen · ${totalAvail} Einheiten`;
+        });
+        wsn.addEventListener('click', e => {
+          e.stopPropagation();
+          const total = subArr.length || totalAvail;
+          const subList = Array.from({ length: total }, (_, i) =>
+            `${subArr[i] ? '✓' : '○'}  ${zone}.${i + 1}`
+          ).join('\n');
+          const btnLabel = isPartial ? 'Fehlende Einheiten anlegen' : isAdded ? null : `${zone} hinzufügen`;
+          openSheet(`${theme.name} – ${zone}`,
+            addedCount > 0 ? `${addedCount} von ${total} Einheiten aktiv` : `${totalAvail} Einheiten verfügbar`,
+            subList, isAdded, btnLabel);
+        });
+      }
+      cnv.appendChild(wsn);
+    });
+
+    const segs = [
+      { x: VOK_LAYOUT.themeX, type: isStarted ? 'active' : 'open' },
+      ...VOK_ZONES_ORDER.map(z => ({ x: VOK_LAYOUT.zoneX[z], type: (theme.naZones&&theme.naZones.includes(z)) ? 'na' : (theme.zones[z]&&theme.zones[z].some(Boolean)) ? 'active' : 'open' })),
+    ];
+    for (let j = 0; j < segs.length - 1; j++) {
+      const a = segs[j], b = segs[j+1];
+      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1',a.x); line.setAttribute('y1',y); line.setAttribute('x2',b.x); line.setAttribute('y2',y);
+      if (a.type==='active'&&b.type!=='na')       { line.setAttribute('stroke','rgba(74,90,122,0.2)');  line.setAttribute('stroke-width','1.5'); }
+      else if (a.type==='na'||b.type==='na')       { line.setAttribute('stroke','rgba(74,90,122,0.06)'); line.setAttribute('stroke-width','1'); line.setAttribute('stroke-dasharray','2 6'); }
+      else                                          { line.setAttribute('stroke','rgba(74,90,122,0.1)');  line.setAttribute('stroke-width','1.2'); line.setAttribute('stroke-dasharray','3 5'); }
+      svg.appendChild(line);
+    }
+  });
+
+  scrl.appendChild(cnv);
+  container.appendChild(scrl);
+}
+buildVokCanvas();
+
+// ─── Toggle between views ─────────────────────────────────────────────────────
+function toggleView(view) {
+  const isVok = view === 'vok';
+  document.getElementById('gram-view').style.display = isVok ? 'none' : '';
+  document.getElementById('vok-view').classList.toggle('on', isVok);
+  document.getElementById('gram-tabs').style.display = isVok ? 'none' : '';
+  document.querySelectorAll('.lp-tog-btn').forEach(b =>
+    b.classList.toggle('on', b.dataset.view === view)
+  );
+}
+
+// ─── Topic descriptions ───────────────────────────────────────────────────────
+const TOPIC_DESC = {
+  'artikel':              'Jedes Substantiv hat ein festes grammatikalisches Geschlecht – maskulin (le, un) oder feminin (la, une). Der Plural wird mit les bzw. des gebildet. Das Genus muss zusammen mit dem Wort gelernt werden.',
+  'present':              'Das Présent de l\'indicatif beschreibt aktuelle und gewohnheitsmäßige Handlungen. Regelmäßige Verben folgen Endungsmustern für -er, -ir und -re. Viele häufige Verben sind unregelmäßig.',
+  'negation':             'Die Verneinung wird mit ne … pas um das Verb gebildet. Im Umgangssprachlichen fällt ne oft weg. Mit jamais, rien oder personne lassen sich weitere Bedeutungen ausdrücken.',
+  'pronoms-sujets':       'Subjektpronomen ersetzen das Subjekt: je, tu, il/elle, nous, vous, ils/elles. Im Französischen darf das Pronomen nicht weggelassen werden. On wird oft statt nous verwendet.',
+  'nombres':              'Zahlen von 1–20 sind unregelmäßig und müssen auswendig gelernt werden. Ab 70 entstehen Zahlen durch Addition (soixante-dix = 60+10). Ordinalzahlen werden mit -ième gebildet.',
+  'pc-avoir':             'Das Passé composé mit avoir beschreibt abgeschlossene Handlungen in der Vergangenheit. Das Partizip Perfekt endet typischerweise auf -é, -i oder -u. Kein Angleich des Partizips beim Objekt nach dem Verb.',
+  'pc-etre':              'Bewegungs- und Zustandsverben (Maison de l\'être) bilden das Passé composé mit être. Das Partizip Perfekt gleicht sich in Genus und Numerus mit dem Subjekt an. Alle Reflexivverben nutzen ebenfalls être.',
+  'imparfait':            'Der Imparfait beschreibt andauernde oder wiederholte Zustände in der Vergangenheit. Er wird aus dem nous-Stamm des Présent gebildet: -ais, -ais, -ait, -ions, -iez, -aient. Im Kontrast zum Passé composé steht er für das Hintergrundgeschehen.',
+  'futur-proche':         'Der Futur proche wird mit aller (Présent) + Infinitiv gebildet. Er drückt eine sichere oder geplante Zukunft aus. Umgangssprachlich wird er häufiger verwendet als der Futur simple.',
+  'questions':            'Fragen können durch Inversion, est-ce que oder Intonation gebildet werden. Fragewörter wie qui, quand, où, pourquoi werden vorangestellt. Im Umgangssprachlichen reicht oft die steigende Intonation.',
+  'adj-accord':           'Adjektive stimmen in Genus und Numerus mit dem Substantiv überein. Die feminine Form wird meist durch angehängtes -e gebildet, der Plural durch -s. Viele häufige Adjektive sind unregelmäßig.',
+  'subjonctif-present':   'Der Subjonctif drückt Wünsche, Zweifel und Emotionen aus, meist nach que. Er wird aus dem ils/elles-Stamm des Présent und den Endungen -e, -es, -e, -ions, -iez, -ent gebildet. Être und avoir haben unregelmäßige Formen.',
+  'conditionnel-present': 'Der Conditionnel présent entspricht dem deutschen Konjunktiv II. Er wird mit dem Futur-Stamm + Imparfait-Endungen gebildet. Im Bedingungssatz (si + Imparfait) steht er im Hauptsatz.',
+  'futur-simple':         'Der Futur simple drückt zukünftige Handlungen und Vorhersagen aus. Die Endungen -ai, -as, -a, -ons, -ez, -ont werden an den Infinitiv angehängt. Viele Verben haben unregelmäßige Futurstämme.',
+  'pronoms-relatifs':     'Relativpronomen verbinden Haupt- und Relativsatz: qui (Subjekt), que (Objekt), dont (Genitiv), où (Ort/Zeit). Die Wahl hängt von der grammatischen Funktion im Relativsatz ab. Sie ersetzen ein Nomen im Nebensatz.',
+  'comparatif':           'Komparativ und Superlativ werden mit plus … que, moins … que, aussi … que gebildet. Der Superlativ verwendet den bestimmten Artikel: le plus, la moins etc. Bon und bien haben unregelmäßige Steigerungsformen.',
+  'discours-indirect':    'Die indirekte Rede wandelt direkte Äußerungen um und passt Pronomen und Zeiten an. Nach einem Vergangenheitstempus rücken die Zeiten eine Stufe zurück (Présent → Imparfait). Fragesätze folgen eigenen Einleitungsformeln.',
+  'pluperfect':           'Das Plus-que-parfait beschreibt Handlungen, die vor einem anderen vergangenen Ereignis abgeschlossen waren. Es wird mit avoir/être im Imparfait + Partizip Perfekt gebildet. Es entspricht dem deutschen Plusquamperfekt.',
+  'conditionnel-passe':   'Der Conditionnel passé drückt nicht realisierte Handlungen in der Vergangenheit aus. Er wird mit avoir/être im Conditionnel présent + Partizip Perfekt gebildet. Im Bedingungssatz steht er mit si + Plus-que-parfait.',
+  'gerondif':             'Das Gérondif wird mit en + Partizip Präsens gebildet und drückt gleichzeitige Handlungen oder Bedingungen aus. Es hat immer dasselbe Subjekt wie das Hauptverb. Beispiel: En travaillant, il écoute de la musique.',
+  'passif':               'Das Passiv wird mit être + Partizip Perfekt gebildet; das Partizip stimmt mit dem Subjekt überein. Das Agens wird mit par oder de eingeführt. Im Französischen wird das Passiv oft durch on-Konstruktionen ersetzt.',
+  'subjonctif-passe':     'Der Subjonctif passé drückt eine abgeschlossene Handlung im Nebensatz aus. Er wird mit avoir/être im Subjonctif présent + Partizip Perfekt gebildet. Er steht nach denselben Ausdrücken wie der Subjonctif présent.',
+  'concordance':          'Die Zeitenfolge regelt das Tempusverhältnis zwischen Haupt- und Nebensatz. Im Subjonctif und der indirekten Rede gelten eigene Regeln zur Tempusanpassung. Im gesprochenen Français courant sind die Regeln vereinfacht.',
+  'participe-present':    'Das Participe présent endet auf -ant und entspricht dem deutschen Partizip I. Als Verb fungiert es unveränderlich, als Adjektiv stimmt es mit dem Nomen überein. Das Gérondif ist eine spezielle Verwendungsform.',
+  'subjonctif-imparfait': 'Der Subjonctif imparfait ist eine literarische Zeitform und kommt im modernen Gebrauch kaum vor. Er wird hauptsächlich in der Literatur und formellen Schriftsprache verwendet. Das Erkennen ist wichtiger als die aktive Beherrschung.',
+  'style-soutenu':        'Der style soutenu bezeichnet den gehobenen Ausdruck in Literatur und offiziellen Texten. Er umfasst besondere Syntax, seltene Zeitformen und einen erweiterten Wortschatz. Wichtig für das Lesen literarischer Texte und C1-Prüfungen.',
+  'pronoms-relatifs-comp':'Zusammengesetzte Relativpronomen (lequel, laquelle, lesquels, lesquelles) stehen nach Präpositionen. Sie stimmen in Genus und Numerus mit dem Bezugsnomen überein. Nach à und de entstehen Kontraktionen: auquel, duquel etc.',
+  'subjonctif-plqpf':     'Der Subjonctif plus-que-parfait ist ausschließlich eine literarische Zeitform. Er ersetzt in der Literatur den Conditionnel passé im Bedingungssatz. Das Erkennen genügt auf C2-Niveau vollständig.',
+  'registres':            'Sprachregister bezeichnen die situationsabhängige Variation der Sprache (familier, courant, soutenu). Auf C2-Niveau wird erwartet, Register bewusst zu wählen und zu erkennen. Dies umfasst Vokabular, Syntax und Stilmittel.',
+  'articles-partitifs': 'Teilungsartikel (du, de la, de l\'eau, des) drücken eine unbestimmte Menge aus. Nach Verneinung und Mengenangaben steht nur de. Sie sind unverzichtbar für Essen, Trinken und alltägliche Beschreibungen.',
+  'pronoms-cod-coi':    'Direkte (COD: le, la, les) und indirekte Objektpronomen (COI: lui, leur) ersetzen Nomen. Sie stehen vor dem konjugierten Verb. Im affirmativen Imperativ folgen sie dem Verb mit Bindestrich.',
+  'reflexifs':          'Reflexive Verben (se lever, s\'habiller) benutzen ein Reflexivpronomen (me, te, se…). Im Passé composé werden sie immer mit être konjugiert. Sehr häufig im Alltag: se réveiller, se souvenir, s\'appeler.',
+  'imperatif':          'Der Imperativ drückt Aufforderungen, Bitten und Verbote aus. Er wird in 2. Sg., 1. Pl. und 2. Pl. gebildet; -er-Verben verlieren das -s in der tu-Form. Objektpronomen folgen dem Verb im affirmativen Imperativ.',
+  'pronoms-y-en':       'y ersetzt Ortsangaben oder Ausdrücke mit à (J\'y vais = Ich gehe dahin). en ersetzt Mengen oder Ausdrücke mit de (J\'en veux deux). Beide stehen wie alle Objektpronomen vor dem Verb.',
+  'phrases-si':         'Bedingungssätze verbinden Bedingung und Folge: si + Présent → Futur simple (reale Möglichkeit); si + Imparfait → Conditionnel présent (hypothetisch); si + Plus-que-parfait → Conditionnel passé (irreale Vergangenheit). Das si-Muster ist eine der zentralen B1/B2-Strukturen.',
+  'verb-ire':          'Verben auf -ire (dire, lire, écrire) und -uire (conduire, construire) folgen einem gemeinsamen Muster. Partizip Perfekt: dit, lu, écrit, conduit. Diese Gruppe enthält viele alltagsrelevante Verben.',
+  'verb-aitre':        'Verben auf -aître (connaître, paraître) und -oître (croître) haben im Stamm vor -t immer ein Zirkumflex. Partizip Perfekt: connu, paru. Das î tritt auch in der 3. Person Singular auf: il connaît.',
+  'verb-boire-croire': 'boire und croire haben einen unregelmäßigen Stamm mit Alternanz: je bois / nous buvons; je crois / nous croyons. Partizip Perfekt: bu, cru. Beide sind im Alltag und in Texten sehr gebräuchlich.',
+  'verb-einzelgaenger':'Verben ohne erkennbares gemeinsames Muster, z. B. fuir, haïr, cueillir, gésir. Sie müssen einzeln gelernt werden und kommen vor allem in literarischen Texten vor.',
+  'verb-ouvrir':       'ouvrir und Verwandte (couvrir, offrir, souffrir) folgen im Présent dem Muster der -er-Verben, nicht der -ir-Verben. Partizip Perfekt: ouvert, couvert, offert, souffert – alle unregelmäßig.',
+  'verb-etre-avoir-aller':      'être, avoir und aller sind die drei wichtigsten unregelmäßigen Verben. Avoir und être sind Hilfsverben für alle zusammengesetzten Zeiten. Alle drei müssen vollständig auswendig gelernt werden.',
+  'verb-dormir-partir':         'Diese Verbgruppe umfasst -ir-Verben, die im Singular das -s verlieren: je dors, tu dors, il dort. Weitere Verben: sortir, servir, sentir. Das Muster unterscheidet sich von den regulären -ir-Verben.',
+  'verb-venir-tenir':           'venir und tenir haben ein unregelmäßiges Présent mit Stammalternanz: je viens / nous venons. Abgeleitete Verben wie revenir, obtenir folgen demselben Muster. Das Passé composé von venir wird mit être gebildet.',
+  'verb-hochfrequenz':          'pouvoir, vouloir, devoir, savoir und faire gehören zu den häufigsten Verben. Sie sind alle unregelmäßig und müssen auswendig gelernt werden. Diese Verben sind unverzichtbar für die alltägliche Kommunikation.',
+  'verb-prendre':               'prendre und seine Ableitungen (apprendre, comprendre) haben einen verkürzten Stamm im Plural. Partizip Perfekt: pris (unregelmäßig). Das Verb wird in vielen idiomatischen Ausdrücken verwendet.',
+  'verb-voir-recevoir':         'voir und recevoir sowie ihre Ableitungen gehören zu den unregelmäßigen -oir-Verben. voir: je vois, il voit, nous voyons. recevoir hat im Singular eine Zedille: je reçois.',
+  'verb-mettre':                'mettre und seine Ableitungen (remettre, permettre, promettre) teilen dasselbe Konjugationsmuster. Partizip Perfekt: mis (unregelmäßig). Das Verb ist in vielen festen Ausdrücken vertreten.',
+};
+
+// ─── Vocab descriptions ────────────────────────────────────────────────────────
+const VOK_DESC = {
+  'Eigene Vokabeln':  'Wörter, die du selbst hinzugefügt hast. Sie erscheinen in deiner Lernrotation und werden nach dem Leitner-System wiederholt.',
+  'Reisen':           'Vokabeln rund um Transport, Unterkunft und Orientierung. Unverzichtbar für Gespräche im Urlaub und auf Reisen in frankophone Länder.',
+  'Familie':          'Verwandtschaftsbezeichnungen und grundlegende Begriffe zum familiären Umfeld. Dieser A1-Grundwortschatz wird in vielen Alltagsgesprächen benötigt.',
+  'Essen':            'Lebensmittel, Mahlzeiten und Ausdrücke fürs Restaurant. Ein wichtiges A1-Thema für den Alltag in Frankreich und frankophonen Ländern.',
+  'Körper':           'Körperteile und grundlegende Begriffe für Gesundheit und Befinden. Teil des A1-Grundwortschatzes und nützlich bei Arztgesprächen.',
+  'Wohnen':           'Wohnräume, Möbel und Begriffe rund ums Zuhause. Ein wichtiges Alltagsthema auf A1–A2-Niveau.',
+  'Arbeit':           'Berufe, Arbeitsumgebung und berufliche Kommunikation auf A2–B1-Niveau.',
+  'Natur':            'Tiere, Pflanzen, Wetter und Umweltbegriffe. Reicht von A1 bis B2-Niveau.',
+  'Freizeit':         'Sport, Hobbys und Freizeitaktivitäten für die Alltagskonversation auf A2–B1-Niveau.',
+  'Gesellschaft':     'Politische und gesellschaftliche Begriffe ab B2-Niveau. Relevant für das Verstehen von Nachrichten und öffentlichen Debatten.',
+  'Abstrakt':         'Abstrakte Konzepte und komplexe Begriffe für C1–C2. Wichtig für akademische und literarische Texte.',
+};
+
+// ─── Action Sheet helper ──────────────────────────────────────────────────────
+function openSheet(title, sub, desc, isOwned, btnLabel) {
+  document.getElementById('as-title').textContent = title;
+  document.getElementById('as-sub').textContent   = sub;
+  const descEl = document.getElementById('as-desc');
+  descEl.textContent = desc || '';
+  descEl.style.display = desc ? '' : 'none';
+  const btn = document.getElementById('asb-main');
+  document.getElementById('asb-icon').textContent  = isOwned ? '✓' : '+';
+  document.getElementById('asb-label').textContent = isOwned ? 'Bereits vollständig' : (btnLabel || 'Jetzt anlegen');
+  btn.disabled = isOwned;
+  btn.onclick  = isOwned ? null : doAnlegen;
+  document.getElementById('as').classList.add('on');
+  document.getElementById('as-bd').classList.add('on');
+}
+
+// ─── Tooltip ──────────────────────────────────────────────────────────────────
+const tip = document.getElementById('tip');
+function attachTooltip(el, getText) {
+  el.addEventListener('mouseenter', () => { tip.textContent = getText(); tip.style.display = 'block'; });
+  el.addEventListener('mousemove', e => { tip.style.left = (e.clientX+14)+'px'; tip.style.top = (e.clientY-8)+'px'; });
+  el.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+}
+
+// ─── Grammar node clicks ──────────────────────────────────────────────────────
+let activeNode = null;
+document.querySelectorAll('.node[data-cat]').forEach(node => {
+  const isOwned = node.classList.contains('st-m') || node.classList.contains('st-a');
+  // Tooltip
+  if (isOwned) {
+    attachTooltip(node, () => {
+      const srs = node.classList.contains('st-m') ? 5 : (+node.dataset.srs||1);
+      const label = node.classList.contains('st-m') ? 'Gemeistert' : `Stufe ${srs} von 5`;
+      return `${node.dataset.topic} · ${label}`;
+    });
+  } else {
+    attachTooltip(node, () => `${node.dataset.topic} · ${node.dataset.level} · Jetzt anlegen`);
+  }
+  // Click
+  node.addEventListener('click', e => {
+    e.stopPropagation();
+    activeNode = node;
+    const cat  = {gram:'Grammatik',verb:'Unregelm. Verben'}[node.dataset.cat] || '';
+    const desc = TOPIC_DESC[node.dataset.id] || '';
+    openSheet(node.dataset.topic, `${node.dataset.level} · ${cat}`, desc, isOwned);
+  });
+});
+
+function doAnlegen() {
+  if (activeNode) showToast(`„${activeNode.dataset.topic}" wird angelegt …`);
+  closeSheet();
+}
+function closeSheet() {
+  document.getElementById('as').classList.remove('on');
+  document.getElementById('as-bd').classList.remove('on');
+}
+
+// ─── Filter (gram view only) ──────────────────────────────────────────────────
+function setFilter(el, cat) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('.node[data-cat]').forEach(n => {
+    n.style.display = (cat==='all' || n.dataset.cat===cat) ? '' : 'none';
+  });
+}
+
+// ─── Panel open/close ─────────────────────────────────────────────────────────
+function openAdd()  {
+  document.getElementById('add-dlg').classList.add('on');
+}
+function closeAdd() {
+  document.getElementById('add-dlg').classList.remove('on');
+}
+function openLP()   {
+  document.getElementById('add-dlg').classList.remove('on');
+  setTimeout(() => {
+    document.getElementById('lp').classList.add('on');
+    document.getElementById('bd').classList.add('on');
+    setTimeout(() => { document.getElementById('c-scroll').scrollLeft = 200; }, 400);
+  }, 140);
+}
+function closeLP()  {
+  document.getElementById('lp').classList.remove('on');
+  document.getElementById('bd').classList.remove('on');
+}
+function closeAll() {
+  document.getElementById('add-dlg').classList.remove('on');
+  document.getElementById('lp').classList.remove('on');
+  document.getElementById('bd').classList.remove('on');
+  closeSheet();
+}
+
+// ─── Toast ────────────────────────────────────────────────────────────────────
+let toastT;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2300);
+}
+
+// ─── SVG size (grammar) ───────────────────────────────────────────────────────
+requestAnimationFrame(() => {
+  svgC.setAttribute('viewBox','0 0 1370 475');
+  svgC.style.height = '475px';
+});
+
+// ─── Event listeners (replaces all onclick attributes for iOS compat) ─────────
+function tap(el, fn) {
+  if (!el) return;
+  el.addEventListener('click', fn);
+  el.addEventListener('touchend', function(e) { e.preventDefault(); fn(); }, { passive: false });
+}
+
+tap(document.getElementById('btn-add'),      openAdd);
+tap(document.getElementById('bd'),           closeAll);
+tap(document.getElementById('mini-lp'),      openLP);
+tap(document.getElementById('btn-close-lp'), closeLP);
+tap(document.getElementById('as-bd'),        closeSheet);
+tap(document.getElementById('btn-as-cancel'),closeSheet);
+tap(document.getElementById('btn-dlg-cancel'), closeAdd);
+// close add-dialog when clicking the backdrop (outside the inner card)
+document.getElementById('add-dlg').addEventListener('click', function(e) {
+  if (e.target === this) closeAdd();
+});
+
+document.querySelectorAll('.lp-tog-btn').forEach(btn => {
+  tap(btn, () => toggleView(btn.dataset.view));
+});
+document.querySelectorAll('.tab[data-filter]').forEach(btn => {
+  tap(btn, () => setFilter(btn, btn.dataset.filter));
+});
+</script>
+</body>
+</html>
